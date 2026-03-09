@@ -1,289 +1,845 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RAIZEL TECH</title>
-
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 
-:root{
-  --bg:#0b0b0d;
-  --card:#141417;
-  --border:#232327;
-  --accent:#8b5cf6;
-  --accent2:#34d399;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
+:root {
+–bg: #040407;
+–surface: #0d0d12;
+–surface2: #131318;
+–border: rgba(255,255,255,0.06);
+–border-glow: rgba(120,80,255,0.35);
+–accent: #7c4dff;
+–accent-bright: #a67fff;
+–green: #00e5a0;
+–cyan: #00c8ff;
+–text: #f0f0f8;
+–muted: #6b6b80;
+–dim: #3a3a4a;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+font-family: ‘Syne’, sans-serif;
+background: var(–bg);
+color: var(–text);
+overflow-x: hidden;
+cursor: none;
 }
 
-body{
-  font-family:"JetBrains Mono", monospace;
-  background:linear-gradient(270deg,#0b0b0d,#050506,#0b0b0d);
-  background-size:600% 600%;
-  animation:gradientBG 18s ease infinite;
-  color:var(--text);
-  overflow-x:hidden;
+/* CUSTOM CURSOR */
+.cursor {
+width: 10px; height: 10px;
+background: var(–accent-bright);
+border-radius: 50%;
+position: fixed; top:0; left:0;
+pointer-events: none;
+z-index: 9999;
+mix-blend-mode: difference;
+transition: transform 0.15s ease;
+}
+.cursor-ring {
+width: 36px; height: 36px;
+border: 1px solid rgba(166,127,255,0.5);
+border-radius: 50%;
+position: fixed; top:0; left:0;
+pointer-events: none;
+z-index: 9998;
+transition: transform 0.4s cubic-bezier(.23,1,.32,1), width 0.3s, height 0.3s, opacity 0.3s;
 }
 
-@keyframes gradientBG{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+/* NOISE OVERLAY */
+body::before {
+content:’’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.04’/%3E%3C/svg%3E”);
+background-size: 150px;
+pointer-events: none;
+z-index: 0;
+opacity: 0.5;
 }
 
-/* NAVBAR */
-
-header{
-  padding:20px 0;
-  backdrop-filter:blur(12px);
-  background:rgba(20,20,23,0.6);
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:10;
+/* GRID LINES */
+body::after {
+content:’’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+background-size: 80px 80px;
+pointer-events: none;
+z-index: 0;
 }
 
-.container{
-  width:90%;
-  max-width:1100px;
-  margin:auto;
+/* GLOW ORBS */
+.orb {
+position: fixed;
+border-radius: 50%;
+filter: blur(120px);
+pointer-events: none;
+z-index: 0;
+animation: drift 20s ease-in-out infinite;
+}
+.orb1 { width:500px; height:500px; background: rgba(124,77,255,0.12); top:-100px; left:-100px; animation-delay:0s; }
+.orb2 { width:400px; height:400px; background: rgba(0,229,160,0.07); bottom:0; right:-100px; animation-delay:-8s; }
+.orb3 { width:300px; height:300px; background: rgba(0,200,255,0.06); top:50%; left:50%; transform:translate(-50%,-50%); animation-delay:-4s; }
+
+@keyframes drift {
+0%,100% { transform: translate(0,0); }
+33% { transform: translate(30px,-20px); }
+66% { transform: translate(-20px,30px); }
 }
 
-nav{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+/* LAYOUT */
+.wrap { width:92%; max-width:1140px; margin:0 auto; position:relative; z-index:1; }
+
+/* NAV */
+header {
+position: sticky; top:0; z-index: 100;
+padding: 18px 0;
+border-bottom: 1px solid var(–border);
+backdrop-filter: blur(24px) saturate(180%);
+background: rgba(4,4,7,0.7);
 }
 
-.logo{
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:1px;
-  color:var(--accent);
+nav { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+
+.logo {
+font-size: 18px; font-weight: 800;
+letter-spacing: 3px;
+text-transform: uppercase;
+display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+width: 32px; height: 32px;
+background: linear-gradient(135deg, var(–accent), var(–cyan));
+clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+display:grid; place-items:center;
+font-size:11px; font-weight:800;
+animation: spinHex 8s linear infinite;
+}
+@keyframes spinHex { to { filter: hue-rotate(360deg); } }
+
+.logo span { background: linear-gradient(90deg, #fff 40%, var(–accent-bright)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+.nav-links { display:flex; gap:6px; }
+.nav-links a {
+color: var(–muted);
+text-decoration: none;
+font-size: 13px;
+font-weight: 600;
+letter-spacing: 1px;
+padding: 8px 16px;
+border-radius: 8px;
+transition: all 0.25s;
+}
+.nav-links a:hover { color: var(–text); background: rgba(255,255,255,0.05); }
+
+.nav-cta {
+font-family: ‘Space Mono’, monospace;
+font-size: 12px; font-weight: 700;
+color: #000 !important;
+background: linear-gradient(135deg, var(–green), var(–cyan)) !important;
+border-radius: 8px !important;
+padding: 8px 18px !important;
+letter-spacing: 0.5px;
+box-shadow: 0 0 20px rgba(0,229,160,0.25);
+transition: all 0.3s !important;
+}
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(0,229,160,0.4) !important; }
+
+/* HERO */
+.hero {
+padding: 130px 0 100px;
+position: relative;
 }
 
-.menu{
-  display:flex;
-  gap:25px;
+.hero-tag {
+display: inline-flex; align-items: center; gap:8px;
+background: rgba(124,77,255,0.1);
+border: 1px solid rgba(124,77,255,0.25);
+border-radius: 100px;
+padding: 6px 16px;
+font-size: 12px;
+font-family: ‘Space Mono’, monospace;
+color: var(–accent-bright);
+margin-bottom: 32px;
+letter-spacing: 1px;
+}
+.hero-tag::before { content:’’; width:6px; height:6px; border-radius:50%; background:var(–green); box-shadow:0 0 8px var(–green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+.hero h1 {
+font-size: clamp(38px,6vw,76px);
+font-weight: 800;
+line-height: 1.05;
+letter-spacing: -1px;
+margin-bottom: 28px;
 }
 
-.menu a{
-  color:var(--muted);
-  text-decoration:none;
-  font-size:14px;
-  transition:0.3s;
-  position:relative;
+.hero h1 .line { display: block; overflow: hidden; }
+.hero h1 .line span { display:inline-block; animation: slideUp 0.8s cubic-bezier(.22,1,.36,1) both; }
+.hero h1 .line:nth-child(1) span { animation-delay: 0.1s; }
+.hero h1 .line:nth-child(2) span { animation-delay: 0.2s; }
+.hero h1 .line:nth-child(3) span { animation-delay: 0.3s; }
+
+@keyframes slideUp {
+from { transform: translateY(100%); opacity:0; }
+to { transform: translateY(0); opacity:1; }
 }
 
-.menu a::after{
-  content:"";
-  position:absolute;
-  left:0;
-  bottom:-6px;
-  width:0%;
-  height:2px;
-  background:var(--accent);
-  transition:0.3s;
+.grad-text { background: linear-gradient(135deg, var(–accent-bright), var(–cyan), var(–green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+.hero-desc {
+font-family: ‘Space Mono’, monospace;
+color: var(–muted);
+font-size: 14px;
+line-height: 1.9;
+max-width: 520px;
+margin-bottom: 48px;
+animation: fadeIn 1s 0.5s both;
 }
 
-.menu a:hover{
-  color:var(--text);
+@keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+.hero-btns { display:flex; gap:16px; flex-wrap:wrap; animation: fadeIn 1s 0.7s both; }
+
+.btn-primary {
+display: inline-flex; align-items:center; gap:10px;
+padding: 16px 32px;
+background: linear-gradient(135deg, var(–accent), #5b21b6);
+color: #fff;
+text-decoration: none;
+border-radius: 12px;
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 0.5px;
+box-shadow: 0 8px 40px rgba(124,77,255,0.35);
+transition: all 0.3s;
+position:relative; overflow:hidden;
+}
+.btn-primary::before {
+content:’’;
+position:absolute; inset:0;
+background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+opacity:0; transition:0.3s;
+}
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 12px 50px rgba(124,77,255,0.5); }
+.btn-primary:hover::before { opacity:1; }
+
+.btn-secondary {
+display: inline-flex; align-items:center; gap:10px;
+padding: 16px 32px;
+background: transparent;
+color: var(–text);
+text-decoration: none;
+border-radius: 12px;
+font-weight: 700;
+font-size: 14px;
+border: 1px solid var(–border);
+transition: all 0.3s;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); transform:translateY(-3px); }
+
+/* STATS */
+.stats {
+display: flex; gap:0;
+margin: 80px 0 0;
+border: 1px solid var(–border);
+border-radius: 16px;
+overflow: hidden;
+animation: fadeIn 1s 0.9s both;
+background: var(–surface);
+}
+.stat { flex:1; padding: 30px 24px; text-align:center; border-right:1px solid var(–border); }
+.stat:last-child { border-right:none; }
+.stat-num { font-size: 32px; font-weight:800; background:linear-gradient(135deg,#fff,var(–accent-bright)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.stat-label { font-size:12px; color:var(–muted); margin-top:4px; font-family:‘Space Mono’,monospace; letter-spacing:1px; }
+
+/* SECTION TITLES */
+.section-header { margin-bottom:60px; }
+.section-tag {
+font-family:‘Space Mono’,monospace;
+font-size:11px;
+color:var(–accent-bright);
+letter-spacing:3px;
+text-transform:uppercase;
+margin-bottom:16px;
+display:flex; align-items:center; gap:12px;
+}
+.section-tag::before { content:’’; width:30px; height:1px; background:var(–accent); }
+.section-title { font-size: clamp(26px,3.5vw,42px); font-weight:800; letter-spacing:-0.5px; }
+.section-desc { color:var(–muted); font-family:‘Space Mono’,monospace; font-size:13px; line-height:1.8; max-width:500px; margin-top:16px; }
+
+/* SERVICES */
+#services { padding: 120px 0; }
+
+.services-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 20px;
 }
 
-.menu a:hover::after{
-  width:100%;
+.service-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 36px 32px;
+position: relative;
+overflow: hidden;
+transition: all 0.4s cubic-bezier(.22,1,.36,1);
+group: true;
 }
 
-/* SECTIONS */
-
-section{
-  padding:100px 0;
+.service-card::before {
+content:’’;
+position:absolute;
+top:0; left:0; right:0;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–accent), transparent);
+opacity:0;
+transition: 0.4s;
 }
 
-.hero{
-  text-align:center;
+.service-card:hover {
+border-color: rgba(124,77,255,0.4);
+transform: translateY(-8px);
+box-shadow: 0 30px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,77,255,0.1);
+}
+.service-card:hover::before { opacity:1; }
+
+.card-glow {
+position:absolute; inset:0;
+background: radial-gradient(circle at 50% 0%, rgba(124,77,255,0.08), transparent 60%);
+opacity:0; transition:0.4s;
+}
+.service-card:hover .card-glow { opacity:1; }
+
+.service-icon {
+width:52px; height:52px;
+background: linear-gradient(135deg, rgba(124,77,255,0.2), rgba(0,200,255,0.1));
+border: 1px solid rgba(124,77,255,0.25);
+border-radius:14px;
+display:grid; place-items:center;
+font-size:22px;
+margin-bottom:24px;
 }
 
-.hero h1{
-  font-size:40px;
-  font-weight:800;
-  margin-bottom:20px;
+.service-card h3 { font-size:20px; font-weight:700; margin-bottom:12px; }
+.service-card p { color:var(–muted); font-family:‘Space Mono’,monospace; font-size:13px; line-height:1.7; }
+
+.price-row {
+display:flex; justify-content:space-between; align-items:center;
+margin-top:28px; padding-top:24px;
+border-top: 1px solid var(–border);
 }
 
-.hero p{
-  color:var(--muted);
-  max-width:600px;
-  margin:auto;
-  margin-bottom:30px;
+.price-tag {
+font-size:20px; font-weight:800;
+color:var(–green);
+font-family:‘Space Mono’,monospace;
 }
 
-.btn{
-  display:inline-block;
-  padding:14px 28px;
-  background:var(--accent);
-  color:#fff;
-  border-radius:12px;
-  text-decoration:none;
-  font-weight:600;
-  transition:0.3s;
-  box-shadow:0 0 20px rgba(139,92,246,0.4);
+.order-btn {
+display: inline-flex; align-items:center; gap:8px;
+padding: 10px 20px;
+background: linear-gradient(135deg, #25d366, #128c7e);
+color: #fff;
+text-decoration: none;
+border-radius: 10px;
+font-size: 13px;
+font-weight: 700;
+transition: all 0.3s;
+box-shadow: 0 4px 20px rgba(37,211,102,0.25);
+}
+.order-btn:hover { transform:scale(1.05); box-shadow:0 6px 30px rgba(37,211,102,0.45); }
+.order-btn svg { width:16px; height:16px; fill:currentColor; }
+
+/* FORMATIONS */
+#formations { padding: 120px 0; background: linear-gradient(180deg, transparent, rgba(124,77,255,0.03), transparent); }
+
+.formations-grid {
+display:grid;
+grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
+gap:20px;
 }
 
-.btn:hover{
-  transform:scale(1.05);
-  background:#7c3aed;
+.formation-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius:20px;
+padding: 36px 32px;
+position:relative; overflow:hidden;
+transition: all 0.4s;
 }
 
-/* CARDS */
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:25px;
-  margin-top:50px;
+.formation-card::after {
+content:’’;
+position:absolute; bottom:0; left:0; right:0; height:2px;
+background: linear-gradient(90deg, var(–cyan), var(–green));
+transform: scaleX(0); transform-origin:left;
+transition:0.4s;
 }
 
-.card{
-  background:rgba(20,20,23,0.7);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:25px;
-  backdrop-filter:blur(10px);
-  transition:0.3s;
+.formation-card:hover { border-color:rgba(0,200,255,0.3); transform:translateY(-6px); box-shadow:0 24px 60px rgba(0,0,0,0.3); }
+.formation-card:hover::after { transform:scaleX(1); }
+
+.formation-badge {
+display:inline-block;
+padding:5px 14px;
+background:rgba(0,200,255,0.1);
+border:1px solid rgba(0,200,255,0.2);
+border-radius:100px;
+font-size:11px;
+color:var(–cyan);
+font-family:‘Space Mono’,monospace;
+letter-spacing:1px;
+margin-bottom:20px;
 }
 
-.card:hover{
-  border-color:var(--accent);
-  transform:translateY(-6px);
-  box-shadow:0 0 25px rgba(139,92,246,0.25);
+.formation-card h3 { font-size:21px; font-weight:700; margin-bottom:12px; }
+.formation-card p { color:var(–muted); font-family:‘Space Mono’,monospace; font-size:13px; line-height:1.7; }
+
+.formation-features {
+list-style:none;
+margin:20px 0;
+}
+.formation-features li {
+display:flex; align-items:center; gap:10px;
+font-size:13px; color:var(–muted);
+padding:6px 0;
+font-family:‘Space Mono’,monospace;
+}
+.formation-features li::before {
+content:’’;
+width:6px; height:6px;
+border-radius:50%;
+background:var(–green);
+flex-shrink:0;
 }
 
-.card h3{
-  margin-bottom:12px;
-  font-weight:600;
+/* PROJETS */
+#projets { padding:120px 0; }
+
+.projets-inner {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius:24px;
+padding:60px;
+text-align:center;
+position:relative;
+overflow:hidden;
 }
 
-.card p{
-  color:var(--muted);
-  font-size:14px;
+.projets-inner::before {
+content:’’;
+position:absolute; top:0; left:50%; transform:translateX(-50%);
+width:300px; height:1px;
+background:linear-gradient(90deg,transparent,var(–accent),transparent);
 }
 
-.price{
-  margin-top:15px;
-  color:var(--accent2);
-  font-weight:600;
+.projets-tags {
+display:flex; flex-wrap:wrap; justify-content:center; gap:12px;
+margin:36px 0;
 }
+
+.ptag {
+padding:10px 22px;
+border-radius:100px;
+font-size:13px;
+font-family:‘Space Mono’,monospace;
+border:1px solid var(–border);
+color:var(–muted);
+transition:all 0.3s;
+background: var(–surface2);
+}
+.ptag:hover { color:var(–text); border-color:rgba(124,77,255,0.4); background:rgba(124,77,255,0.08); transform:translateY(-3px); }
+
+.projets-desc { color:var(–muted); font-family:‘Space Mono’,monospace; font-size:14px; line-height:1.9; max-width:560px; margin:0 auto 36px; }
+
+/* CONTACT */
+#contact { padding:120px 0; }
+
+.contact-grid {
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:24px;
+}
+
+.contact-card {
+background:var(–surface);
+border:1px solid var(–border);
+border-radius:20px;
+padding:40px 36px;
+display:flex; flex-direction:column; gap:20px;
+transition:all 0.3s;
+}
+.contact-card:hover { border-color:rgba(37,211,102,0.3); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+
+.contact-icon {
+width:56px; height:56px;
+background:rgba(37,211,102,0.1);
+border:1px solid rgba(37,211,102,0.2);
+border-radius:16px;
+display:grid; place-items:center;
+font-size:26px;
+}
+
+.contact-card h3 { font-size:20px; font-weight:700; }
+.contact-card p { color:var(–muted); font-family:‘Space Mono’,monospace; font-size:13px; line-height:1.7; }
+
+.contact-link {
+display:inline-flex; align-items:center; gap:10px;
+padding:12px 24px;
+background:linear-gradient(135deg,#25d366,#128c7e);
+color:#fff;
+text-decoration:none;
+border-radius:12px;
+font-weight:700;
+font-size:14px;
+transition:all 0.3s;
+box-shadow:0 6px 24px rgba(37,211,102,0.25);
+width:fit-content;
+}
+.contact-link:hover { transform:translateY(-3px); box-shadow:0 10px 40px rgba(37,211,102,0.4); }
+
+.contact-link-tg {
+background:linear-gradient(135deg,#2aabee,#1a8abf);
+box-shadow:0 6px 24px rgba(42,171,238,0.25);
+}
+.contact-link-tg:hover { box-shadow:0 10px 40px rgba(42,171,238,0.4); }
 
 /* FOOTER */
+footer {
+border-top:1px solid var(–border);
+padding:40px 0;
+position:relative; z-index:1;
+}
+.footer-inner {
+display:flex; justify-content:space-between; align-items:center;
+flex-wrap:wrap; gap:20px;
+}
+.footer-logo { font-size:15px; font-weight:800; letter-spacing:2px; color:var(–muted); }
+.footer-copy { font-size:12px; color:var(–dim); font-family:‘Space Mono’,monospace; }
+.footer-badge {
+display:flex; align-items:center; gap:8px;
+font-size:12px; color:var(–muted);
+font-family:‘Space Mono’,monospace;
+}
+.footer-badge::before { content:’’; width:6px; height:6px; border-radius:50%; background:var(–green); box-shadow:0 0 8px var(–green); animation:pulse 2s infinite; }
 
-footer{
-  text-align:center;
-  padding:40px 0;
-  border-top:1px solid var(--border);
-  color:var(--muted);
-  font-size:13px;
+/* SCROLLBAR */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(–bg); }
+::-webkit-scrollbar-thumb { background:var(–accent); border-radius:4px; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+.nav-links { display:none; }
+.stats { flex-wrap:wrap; }
+.stat { flex:1 1 50%; border-right:none; border-bottom:1px solid var(–border); }
+.contact-grid { grid-template-columns:1fr; }
+.projets-inner { padding:40px 28px; }
+.hero h1 { font-size:36px; }
 }
 
 </style>
 </head>
 <body>
 
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- HEADER -->
+
 <header>
-  <div class="container">
+  <div class="wrap">
     <nav>
-      <div class="logo">RAIZEL TECH</div>
-      <div class="menu">
+      <div class="logo">
+        <div class="logo-icon">R</div>
+        <span>RAIZEL TECH</span>
+      </div>
+      <div class="nav-links">
         <a href="#services">Services</a>
         <a href="#formations">Formations</a>
         <a href="#projets">Projets</a>
         <a href="#contact">Contact</a>
       </div>
+      <a href="https://wa.me/237679064679" target="_blank" class="nav-cta">📲 WhatsApp</a>
     </nav>
   </div>
 </header>
 
+<!-- HERO -->
+
 <section class="hero">
-  <div class="container">
-    <h1>Solutions Digitales & Intelligence Artificielle</h1>
-    <p>
-      Développement de sites web, bots automatisés, applications modernes et formations professionnelles.
+  <div class="wrap">
+    <div class="hero-tag">⚡ Solutions Digitales & IA — Cameroun</div>
+    <h1>
+      <span class="line"><span>Digital.</span></span>
+      <span class="line"><span>Intelligent.</span></span>
+      <span class="line"><span class="grad-text">Raizel Tech.</span></span>
+    </h1>
+    <p class="hero-desc">
+      Développement web, bots IA, applications modernes et formations professionnelles pour propulser votre business vers le futur.
     </p>
-    <a href="#contact" class="btn">Nous contacter</a>
+    <div class="hero-btns">
+      <a href="https://wa.me/237679064679" target="_blank" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Commander maintenant
+      </a>
+      <a href="#services" class="btn-secondary">Voir les services →</a>
+    </div>
+
+```
+<div class="stats">
+  <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Projets réalisés</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Clients satisfaits</div></div>
+  <div class="stat"><div class="stat-num">24h</div><div class="stat-label">Support réactif</div></div>
+  <div class="stat"><div class="stat-num">3+</div><div class="stat-label">Ans d'expérience</div></div>
+</div>
+```
+
   </div>
 </section>
+
+<!-- SERVICES -->
 
 <section id="services">
-  <div class="container">
-    <h2>Services</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Site Vitrine</h3>
-        <p>Création de site professionnel moderne et optimisé.</p>
-        <div class="price">20 000 XAF</div>
-      </div>
-      <div class="card">
-        <h3>Site E-commerce</h3>
-        <p>Boutique en ligne complète avec paiement intégré.</p>
-        <div class="price">60 000 XAF</div>
-      </div>
-      <div class="card">
-        <h3>Bot WhatsApp IA</h3>
-        <p>Automatisation intelligente pour entreprises.</p>
-        <div class="price">10 000 XAF</div>
-      </div>
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-tag">Services</div>
+      <h2 class="section-title">Ce que nous créons <span class="grad-text">pour vous</span></h2>
+      <p class="section-desc">Des solutions digitales sur-mesure, livrées rapidement avec une qualité professionnelle.</p>
+    </div>
+
+```
+<div class="services-grid">
+  <div class="service-card">
+    <div class="card-glow"></div>
+    <div class="service-icon">🌐</div>
+    <h3>Site Vitrine</h3>
+    <p>Site web professionnel, moderne et optimisé pour présenter votre activité avec style et efficacité.</p>
+    <div class="price-row">
+      <div class="price-tag">20 000 XAF</div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20commander%20un%20Site%20Vitrine%20à%2020%20000%20XAF." target="_blank" class="order-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Commander
+      </a>
     </div>
   </div>
+
+  <div class="service-card">
+    <div class="card-glow"></div>
+    <div class="service-icon">🛒</div>
+    <h3>Site E-commerce</h3>
+    <p>Boutique en ligne complète avec catalogue produits, panier et paiement intégré. Vendez partout.</p>
+    <div class="price-row">
+      <div class="price-tag">60 000 XAF</div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20commander%20un%20Site%20E-commerce%20à%2060%20000%20XAF." target="_blank" class="order-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Commander
+      </a>
+    </div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-glow"></div>
+    <div class="service-icon">🤖</div>
+    <h3>Bot WhatsApp IA</h3>
+    <p>Automatisation intelligente pour gérer vos clients, commandes et répondre 24h/24 sans intervention humaine.</p>
+    <div class="price-row">
+      <div class="price-tag">10 000 XAF</div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20commander%20un%20Bot%20WhatsApp%20IA%20à%2010%20000%20XAF." target="_blank" class="order-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Commander
+      </a>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
 </section>
+
+<!-- FORMATIONS -->
 
 <section id="formations">
-  <div class="container">
-    <h2>Formations</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Développement Web</h3>
-        <p>HTML, CSS, JavaScript et projets réels.</p>
-        <div class="price">60 000 XAF</div>
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-tag">Formations</div>
+      <h2 class="section-title">Montez en <span class="grad-text">compétences</span></h2>
+      <p class="section-desc">Des formations pratiques pour apprendre les outils du futur et lancer vos propres projets.</p>
+    </div>
+
+```
+<div class="formations-grid">
+  <div class="formation-card">
+    <div class="formation-badge">FORMATION PRO</div>
+    <h3>Développement Web</h3>
+    <p>De zéro au déploiement — HTML, CSS, JavaScript et projets réels pour construire votre portfolio.</p>
+    <ul class="formation-features">
+      <li>HTML, CSS, JavaScript fondamentaux</li>
+      <li>Projets concrets et portfolio</li>
+      <li>Support post-formation inclus</li>
+    </ul>
+    <div class="price-row">
+      <div class="price-tag">60 000 XAF</div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20m%27inscrire%20à%20la%20formation%20Développement%20Web%20à%2060%20000%20XAF." target="_blank" class="order-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        S'inscrire
+      </a>
+    </div>
+  </div>
+
+  <div class="formation-card">
+    <div class="formation-badge">FORMATION PRO</div>
+    <h3>Création Bots WhatsApp</h3>
+    <p>Apprenez à développer, personnaliser et déployer vos propres bots intelligents pour automatiser vos activités.</p>
+    <ul class="formation-features">
+      <li>Logique et architecture de bots</li>
+      <li>Intégration WhatsApp API</li>
+      <li>Déploiement en production</li>
+    </ul>
+    <div class="price-row">
+      <div class="price-tag">12 000 XAF</div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20m%27inscrire%20à%20la%20formation%20Création%20Bots%20WhatsApp%20à%2012%20000%20XAF." target="_blank" class="order-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        S'inscrire
+      </a>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- PROJETS -->
+
+<section id="projets">
+  <div class="wrap">
+    <div class="projets-inner">
+      <div class="section-tag" style="justify-content:center;">Projets</div>
+      <h2 class="section-title" style="margin-top:12px;">Notre <span class="grad-text">portfolio</span></h2>
+      <p class="projets-desc">Plusieurs plateformes digitales, bots intelligents et dashboards réalisés pour entreprises et particuliers à travers le Cameroun et l'Afrique.</p>
+      <div class="projets-tags">
+        <div class="ptag">🌐 Sites vitrine</div>
+        <div class="ptag">🛒 E-commerce</div>
+        <div class="ptag">🤖 Bots WhatsApp</div>
+        <div class="ptag">📊 Dashboards</div>
+        <div class="ptag">📱 Apps mobiles</div>
+        <div class="ptag">🔌 Intégrations API</div>
+        <div class="ptag">⚡ Automatisations</div>
       </div>
-      <div class="card">
-        <h3>Création Bots WhatsApp</h3>
-        <p>Apprenez à développer et déployer vos bots.</p>
-        <div class="price">12 000 XAF</div>
-      </div>
+      <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20voudrais%20voir%20vos%20réalisations%20et%20discuter%20d%27un%20projet." target="_blank" class="btn-primary" style="margin:0 auto;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Voir nos réalisations
+      </a>
     </div>
   </div>
 </section>
 
-<section id="projets">
-  <div class="container">
-    <h2>Projets</h2>
-    <p style="color:var(--muted);margin-top:20px;">
-      Plusieurs plateformes digitales, bots intelligents et dashboards réalisés pour entreprises et particuliers.
-    </p>
-  </div>
-</section>
+<!-- CONTACT -->
 
 <section id="contact">
-  <div class="container">
-    <h2>Contact</h2>
-    <p style="color:var(--muted);margin-top:20px;">
-      WhatsApp : 679064679 <br>
-      Telegram : @DevRaizel
-    </p>
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-tag">Contact</div>
+      <h2 class="section-title">Parlons de votre <span class="grad-text">projet</span></h2>
+      <p class="section-desc">Disponibles 7j/7 pour répondre à vos questions et démarrer votre projet rapidement.</p>
+    </div>
+
+```
+<div class="contact-grid">
+  <div class="contact-card">
+    <div class="contact-icon">💬</div>
+    <h3>WhatsApp</h3>
+    <p>Contactez-nous directement sur WhatsApp pour discuter de votre projet, obtenir un devis ou passer commande.</p>
+    <a href="https://wa.me/237679064679?text=Bonjour%20RAIZEL%20TECH%2C%20je%20souhaite%20discuter%20d%27un%20projet." target="_blank" class="contact-link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      +237 679 064 679
+    </a>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-icon" style="background:rgba(42,171,238,0.1);border-color:rgba(42,171,238,0.2);">✈️</div>
+    <h3>Telegram</h3>
+    <p>Rejoignez-nous sur Telegram pour suivre nos actualités, nouvelles offres et pour un suivi de projet en temps réel.</p>
+    <a href="https://t.me/DevRaizel" target="_blank" class="contact-link contact-link-tg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.11 13.56 3.15 12.67c-.643-.204-.657-.643.136-.953l10.825-4.172c.537-.194 1.006.13.451 2.703z"/></svg>
+      @DevRaizel
+    </a>
+  </div>
+</div>
+```
+
   </div>
 </section>
 
+<!-- FOOTER -->
+
 <footer>
-  © 2026 RAIZEL TECH — Tous droits réservés
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-logo">RAIZEL TECH</div>
+      <div class="footer-copy">© 2026 RAIZEL TECH — Tous droits réservés</div>
+      <div class="footer-badge">Système en ligne</div>
+    </div>
+  </div>
 </footer>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mouseX=0, mouseY=0, ringX=0, ringY=0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  cursor.style.transform = `translate(${mouseX-5}px,${mouseY-5}px)`;
+});
+
+function animateRing(){
+  ringX += (mouseX - ringX - 18) * 0.12;
+  ringY += (mouseY - ringY - 18) * 0.12;
+  ring.style.transform = `translate(${ringX}px,${ringY}px)`;
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter',()=>{ ring.style.width='60px'; ring.style.height='60px'; ring.style.opacity='0.5'; });
+  el.addEventListener('mouseleave',()=>{ ring.style.width='36px'; ring.style.height='36px'; ring.style.opacity='1'; });
+});
+
+// Intersection observer for animations
+const cards = document.querySelectorAll('.service-card, .formation-card, .contact-card, .stat');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>{ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }, i*80);
+      io.unobserve(e.target);
+    }
+  });
+},{ threshold:0.1 });
+
+cards.forEach(c=>{ c.style.opacity='0'; c.style.transform='translateY(30px)'; c.style.transition='all 0.6s cubic-bezier(.22,1,.36,1)'; io.observe(c); });
+</script>
 
 </body>
 </html>
